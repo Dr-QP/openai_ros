@@ -2,10 +2,13 @@ import rospy
 import gym
 from gym import error, spaces
 from gym.utils import seeding
-from gazebo_connection import GazeboConnection
-from controllers_connection import ControllersConnection
+#from gazebo_connection import GazeboConnection
+from .gazebo_connection import GazeboConnection
+#from controllers_connection import ControllersConnection
+from .controllers_connection import ControllersConnection
 #https://bitbucket.org/theconstructcore/theconstruct_msgs/src/master/msg/RLExperimentInfo.msg
 from theconstruct_msgs.msg import RLExperimentInfo
+import numpy as np
 
 # https://github.com/openai/gym/blob/master/gym/core.py
 class RobotGazeboEnv(gym.Env):
@@ -18,6 +21,16 @@ class RobotGazeboEnv(gym.Env):
         self.reset_controls = reset_controls
         self.seed()
         self.action_space = spaces.Discrete(n_actions)
+        
+        high = np.array([
+            50 * 2,
+            np.finfo(np.float32).max,
+            50 * 2,
+            np.finfo(np.float32).max])
+        self.observation_space = spaces.Box(-high, high)
+        print ("Spaces:")
+        print (self.observation_space)
+        print (self.action_space)
 
         # Set up ROS related variables
         self.reward_pub = rospy.Publisher('/openai/reward', RLExperimentInfo, queue_size=1)
@@ -109,6 +122,8 @@ class RobotGazeboEnv(gym.Env):
             
             self._check_all_systems_ready()
             self.gazebo.pauseSim()
+            
+        self.steps_beyond_done = None
         
 
         return True

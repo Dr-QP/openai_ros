@@ -6,7 +6,7 @@ import roslaunch
 import time
 import numpy as np
 from gym import utils, spaces
-from gym_gazebo.envs import gazebo_env
+#from gym_gazebo.envs import gazebo_env
 from geometry_msgs.msg import Twist
 from std_srvs.srv import Empty
 from gym.utils import seeding
