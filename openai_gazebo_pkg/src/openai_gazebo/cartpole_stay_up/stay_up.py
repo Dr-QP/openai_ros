@@ -1,6 +1,7 @@
 from gym import utils
 from openai_gazebo import mycartpole_env_v1
 from gym.envs.registration import register
+from gym import error, spaces
 import rospy
 import math
 import numpy as np
@@ -17,8 +18,10 @@ class CartPoleStayUpEnv(mycartpole_env_v1.CartPoleEnv):
         
         self.get_params()
         
+        self.action_space = spaces.Discrete(self.n_actions)
+        
         mycartpole_env_v1.CartPoleEnv.__init__(
-            self, n_actions=self.n_actions, control_type=self.control_type
+            self, control_type=self.control_type
             )
             
     def get_params(self):
@@ -147,21 +150,6 @@ class CartPoleStayUpEnv(mycartpole_env_v1.CartPoleEnv):
             reward = 0.0
         
         return reward
-        
-    def _convert_obs_to_state(self, observations):
-        """
-        Converts the observations used for reward and so on to the essentials for the robot state
-        In this case we only need the orientation of the cube and the speed of the disc.
-        The distance doesnt condition at all the actions
-        """
-        # We consider the Pole and the Base Velocities as the state
-    
-        base_velocity = observations[1]
-        pole_velocity = observations[3]
-
-        state = observations
-
-        return state
         
     def _init_env_variables(self):
         """

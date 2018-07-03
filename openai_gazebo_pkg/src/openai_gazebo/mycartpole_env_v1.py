@@ -27,7 +27,7 @@ from openai_gazebo import robot_gazebo_env
 #class CartPoleEnv(gazebo_env.GazeboEnv):
 class CartPoleEnv(robot_gazebo_env.RobotGazeboEnv):
     def __init__(
-        self, n_actions, control_type
+        self, control_type
     ):
         
         self.publishers_array = []
@@ -37,8 +37,6 @@ class CartPoleEnv(robot_gazebo_env.RobotGazeboEnv):
         self.publishers_array.append(self._pole_pub)
         
         rospy.Subscriber("/cartpole_v0/joint_states", JointState, self.joints_callback)
-
-        self.action_space = spaces.Discrete(4) #l,r,L,R,nothing
         
         self.control_type = control_type
         if self.control_type == "velocity":
@@ -67,7 +65,6 @@ class CartPoleEnv(robot_gazebo_env.RobotGazeboEnv):
         self.steps_beyond_done = None
         
         super(CartPoleEnv, self).__init__(
-            n_actions=self.n_actions, 
             controllers_list=self.controllers_list,
             robot_name_space=self.robot_name_space,
             reset_controls=self.reset_controls
