@@ -19,6 +19,12 @@ class CartPoleStayUpEnv(mycartpole_env_v1.CartPoleEnv):
         self.get_params()
         
         self.action_space = spaces.Discrete(self.n_actions)
+        high = np.array([
+            2.5 * 2,
+            np.finfo(np.float32).max,
+            0.7 * 2,
+            np.finfo(np.float32).max])
+        self.observation_space = spaces.Box(-high, high)
         
         mycartpole_env_v1.CartPoleEnv.__init__(
             self, control_type=self.control_type

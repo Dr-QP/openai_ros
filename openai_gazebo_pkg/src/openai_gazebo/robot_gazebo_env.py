@@ -18,16 +18,6 @@ class RobotGazeboEnv(gym.Env):
         self.controllers_object = ControllersConnection(namespace=robot_name_space, controllers_list=controllers_list)
         self.reset_controls = reset_controls
         self.seed()
-        
-        high = np.array([
-            2.5 * 2,
-            np.finfo(np.float32).max,
-            0.4 * 2,
-            np.finfo(np.float32).max])
-        self.observation_space = spaces.Box(-high, high)
-        #print ("Spaces:")
-        #print (self.observation_space)
-        #print (self.action_space)
 
         # Set up ROS related variables
         self.episode_num = 0
