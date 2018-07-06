@@ -21,7 +21,7 @@ from std_msgs.msg import Float64
 from gazebo_msgs.srv import SetLinkState
 from gazebo_msgs.msg import LinkState
 from rosgraph_msgs.msg import Clock
-from openai_gazebo import robot_gazebo_env
+from openai_ros import robot_gazebo_env
 
 
 #class CartPoleEnv(gazebo_env.GazeboEnv):

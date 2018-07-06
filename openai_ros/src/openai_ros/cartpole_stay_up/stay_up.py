@@ -1,15 +1,15 @@
 from gym import utils
-from openai_gazebo import mycartpole_env_v1
+from openai_ros import mycartpole_env_v1
 from gym.envs.registration import register
 from gym import error, spaces
 import rospy
 import math
 import numpy as np
 
-# The path is __init__.py of openai_gazebo, where we import the MovingCubeOneDiskWalkEnv directly
+# The path is __init__.py of openai_ros, where we import the MovingCubeOneDiskWalkEnv directly
 register(
         id='CartPoleStayUp-v0',
-        entry_point='openai_gazebo:CartPoleStayUpEnv',
+        entry_point='openai_ros:CartPoleStayUpEnv',
         timestep_limit=1000,
     )
 
