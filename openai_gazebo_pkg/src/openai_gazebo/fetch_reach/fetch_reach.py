@@ -19,6 +19,9 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
     def __init__(self):
         
         self.get_params()
+        self._env_setup(initial_qpos=self.init_pos)
+        self.goal = self._sample_goal()
+        self._get_obs()
         
         self.action_space = spaces.Box(-1., 1., shape=(self.n_actions,), dtype='float32')
         self.observation_space = spaces.Dict(dict(
@@ -110,13 +113,17 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
             object_velp -= grip_velp
         else:
             object_pos = object_rot = object_velp = object_velr = object_rel_pos = np.zeros(0)
+            
         gripper_state = robot_qpos[-2:]
         gripper_vel = robot_qvel[-2:] #* dt  # change to a scalar if the gripper is made symmetric
-
+        """
         if not self.has_object:
             achieved_goal = grip_pos_array.copy()
         else:
             achieved_goal = np.squeeze(object_pos.copy())
+        """    
+        achieved_goal = self._sample_achieved_goal(grip_pos_array, object_pos)
+            
         obs = np.concatenate([
             grip_pos_array, object_pos.ravel(), object_rel_pos.ravel(), gripper_state, object_rot.ravel(),
             object_velp.ravel(), object_velr.ravel(), gripper_vel,
@@ -141,7 +148,6 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
             return -(d > self.distance_threshold).astype(np.float32)
         else:
             return -d
-
         
     def _init_env_variables(self):
         """
@@ -150,3 +156,65 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
         :return:
         """
         pass
+    
+    def _set_init_pose(self):
+        """Sets the Robot in its init pose
+        """
+        self.move_joints(self.init_pos)
+
+        return True
+        
+    def goal_distance(goal_a, goal_b):
+        assert goal_a.shape == goal_b.shape
+        return np.linalg.norm(goal_a - goal_b, axis=-1)
+        
+
+    def _sample_goal(self):
+        if self.has_object:
+            goal = self.initial_gripper_xpos[:3] + self.np_random.uniform(-self.target_range, self.target_range, size=3)
+            goal += self.target_offset
+            goal[2] = self.height_offset
+            if self.target_in_the_air and self.np_random.uniform() < 0.5:
+                goal[2] += self.np_random.uniform(0, 0.45)
+        else:
+            goal = self.initial_gripper_xpos[:3] + self.np_random.uniform(-0.15, 0.15, size=3)
+        
+        #return goal.copy()
+        return goal
+        
+    def _sample_achieved_goal(self, grip_pos_array, object_pos):
+        if not self.has_object:
+            achieved_goal = grip_pos_array.copy()
+        else:
+            achieved_goal = np.squeeze(object_pos.copy())
+        
+        #return achieved_goal.copy()
+        return achieved_goal
+        
+    def _env_setup(self, initial_qpos):
+        for name, value in initial_qpos.items():
+            self.set_trajectory_joints(initial_qpos)
+            #self.execute_trajectory()
+        #utils.reset_mocap_welds(self.sim)
+        #self.sim.forward()
+
+        # Move end effector into position.
+        gripper_target = np.array([0.498, 0.005, 0.431 + self.gripper_extra_height])# + self.sim.data.get_site_xpos('robot0:grip')
+        gripper_rotation = np.array([1., 0., 1., 0.])
+        #self.sim.data.set_mocap_pos('robot0:mocap', gripper_target)
+        #self.sim.data.set_mocap_quat('robot0:mocap', gripper_rotation)
+        action = np.concatenate([gripper_target, gripper_rotation])
+        self.set_trajectory_ee(action)
+        #self.execute_trajectory()
+        #for _ in range(10):
+            #self.sim.step()
+            #self.step()
+
+        # Extract information for sampling goals.
+        #self.initial_gripper_xpos = self.sim.data.get_site_xpos('robot0:grip').copy()
+        gripper_pos = self.get_ee_pose()
+        gripper_pose_array = np.array([gripper_pos.pose.position.x, gripper_pos.pose.position.y, gripper_pos.pose.position.z])
+        self.initial_gripper_xpos = gripper_pose_array.copy()
+        if self.has_object:
+            self.height_offset = self.sim.data.get_site_xpos('object0')[2]
+    

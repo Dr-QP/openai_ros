@@ -7,7 +7,8 @@ from .controllers_connection import ControllersConnection
 from theconstruct_msgs.msg import RLExperimentInfo
 
 # https://github.com/openai/gym/blob/master/gym/core.py
-class RobotGazeboEnv(gym.Env):
+#class RobotGazeboEnv(gym.Env):
+class RobotGazeboEnv(gym.GoalEnv):
 
     def __init__(self, robot_name_space, controllers_list, reset_controls):
 

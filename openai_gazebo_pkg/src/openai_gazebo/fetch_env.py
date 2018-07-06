@@ -54,12 +54,6 @@ class FetchEnv(robot_gazebo_env.RobotGazeboEnv):
 
     # RobotGazeboEnv virtual methods
     # ----------------------------
-    def _set_init_pose(self):
-        """Sets the Robot in its init pose
-        """
-        self.move_joints(self.init_pos)
-
-        return True
 
     def _check_all_systems_ready(self):
         """
