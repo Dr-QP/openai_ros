@@ -4,7 +4,7 @@ from openai_gazebo import robot_gazebo_env
 from std_msgs.msg import Float64
 from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
-from tf.transformations import euler_from_quaternion
+from fetch_train.srv import EePose, EePoseRequest, EeRpy, EeRpyRequest, EeTraj, EeTrajRequest, JointTraj, JointTrajRequest
 
 
 class FetchEnv(robot_gazebo_env.RobotGazeboEnv):
@@ -29,16 +29,17 @@ class FetchEnv(robot_gazebo_env.RobotGazeboEnv):
         """
 
         # We Start all the ROS related Subscribers and publishers
+        
         JOINT_STATES_SUBSCRIBER = '/joint_states'
         
-        self.joint_states_sub = rospy.Subscriber(JOINT_STATES_SUBSCRIBER, JointState, self.joint_states_callback)
+        self.joint_states_sub = rospy.Subscriber(JOINT_STATES_SUBSCRIBER, JointState, self.joints_callback)
         self.joint_states_data = JointState()
-        
+        """
         self.ee_traj_client = rospy.ServiceProxy('/ee_traj_srv', EeTraj)
         self.joint_traj_client = rospy.ServiceProxy('/joint_traj_srv', JointTraj)
         self.ee_pose_client = rospy.ServiceProxy('/ee_pose_srv', EePose)
         self.ee_rpy_client = rospy.ServiceProxy('/ee_rpy_srv', EeRpy)
-        
+        """
         # Variables that we give through the constructor.
 
         self.controllers_list = []

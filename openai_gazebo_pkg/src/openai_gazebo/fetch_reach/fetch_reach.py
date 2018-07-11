@@ -1,11 +1,12 @@
 from gym import utils
-from gym.envs.robotics import fetch_env_v2
 
 import rospy
 from gym import spaces
 from openai_gazebo import fetch_env
 from gym.envs.registration import register
 import numpy as np
+from sensor_msgs.msg import JointState
+from fetch_train.srv import EePose, EePoseRequest, EeRpy, EeRpyRequest, EeTraj, EeTrajRequest, JointTraj, JointTrajRequest
 
 
 register(
@@ -19,9 +20,19 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
     def __init__(self):
         
         self.get_params()
-        self._env_setup(initial_qpos=self.init_pos)
+        
+        self.ee_traj_client = rospy.ServiceProxy('/ee_traj_srv', EeTraj)
+        self.joint_traj_client = rospy.ServiceProxy('/joint_traj_srv', JointTraj)
+        self.ee_pose_client = rospy.ServiceProxy('/ee_pose_srv', EePose)
+        self.ee_rpy_client = rospy.ServiceProxy('/ee_rpy_srv', EeRpy)
+        
+        
+        fetch_env.FetchEnv.__init__(self)
+        utils.EzPickle.__init__(self)
+        
+        #self._env_setup(initial_qpos=self.init_pos)
         self.goal = self._sample_goal()
-        self._get_obs()
+        obs = self._get_obs()
         
         self.action_space = spaces.Box(-1., 1., shape=(self.n_actions,), dtype='float32')
         self.observation_space = spaces.Dict(dict(
@@ -29,9 +40,6 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
             achieved_goal=spaces.Box(-np.inf, np.inf, shape=obs['achieved_goal'].shape, dtype='float32'),
             observation=spaces.Box(-np.inf, np.inf, shape=obs['observation'].shape, dtype='float32'),
         ))
-        
-        fetch_env.FetchEnv.__init__(self)
-        utils.EzPickle.__init__(self)
 
         
     def get_params(self):
@@ -69,7 +77,6 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
             'joint4': 0.0,
             'joint5': 1.5,
             'joint6': 0.0,
-            'object': [1.25, 0.53, 0.4, 1., 0., 0., 0.],
         }
         
     def _set_action(self, action):
@@ -217,4 +224,7 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
         self.initial_gripper_xpos = gripper_pose_array.copy()
         if self.has_object:
             self.height_offset = self.sim.data.get_site_xpos('object0')[2]
+            
+        self.goal = self._sample_goal()
+        self._get_obs()
     
