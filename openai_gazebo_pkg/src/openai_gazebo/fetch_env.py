@@ -34,13 +34,15 @@ class FetchEnv(robot_gazebo_env.RobotGazeboEnv):
         JOINT_STATES_SUBSCRIBER = '/joint_states'
         
         self.joint_states_sub = rospy.Subscriber(JOINT_STATES_SUBSCRIBER, JointState, self.joints_callback)
+
         self.joints = JointState()
         
+        """
         self.ee_traj_client = rospy.ServiceProxy('/ee_traj_srv', EeTraj)
         self.joint_traj_client = rospy.ServiceProxy('/joint_traj_srv', JointTraj)
         self.ee_pose_client = rospy.ServiceProxy('/ee_pose_srv', EePose)
         self.ee_rpy_client = rospy.ServiceProxy('/ee_rpy_srv', EeRpy)
-        
+        """
         # Variables that we give through the constructor.
 
         self.controllers_list = []

@@ -19,6 +19,7 @@ class RobotGazeboEnv(gym.GoalEnv):
         self.reset_controls = reset_controls
         print (self.reset_controls)
         self.seed()
+        self._env_setup(initial_qpos=self.init_pos)
 
         # Set up ROS related variables
         self.episode_num = 0

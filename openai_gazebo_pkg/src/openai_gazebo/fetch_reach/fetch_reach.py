@@ -7,7 +7,10 @@ from gym.envs.registration import register
 import numpy as np
 from sensor_msgs.msg import JointState
 from fetch_train.srv import EePose, EePoseRequest, EeRpy, EeRpyRequest, EeTraj, EeTrajRequest, JointTraj, JointTrajRequest
+<<<<<<< HEAD
 from openai_gazebo import rotations, utils_fetch
+=======
+>>>>>>> 8964383b7b92608da874c137ffe483f99dfbda66
 
 
 register(
@@ -24,6 +27,7 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
         
         self.get_params()
         
+<<<<<<< HEAD
         fetch_env.FetchEnv.__init__(self)
         utils.EzPickle.__init__(self)
         
@@ -32,6 +36,19 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
         
         #self.goal = self._sample_goal()
         print ("Call get_obs")
+=======
+        self.ee_traj_client = rospy.ServiceProxy('/ee_traj_srv', EeTraj)
+        self.joint_traj_client = rospy.ServiceProxy('/joint_traj_srv', JointTraj)
+        self.ee_pose_client = rospy.ServiceProxy('/ee_pose_srv', EePose)
+        self.ee_rpy_client = rospy.ServiceProxy('/ee_rpy_srv', EeRpy)
+        
+        
+        fetch_env.FetchEnv.__init__(self)
+        utils.EzPickle.__init__(self)
+        
+        #self._env_setup(initial_qpos=self.init_pos)
+        self.goal = self._sample_goal()
+>>>>>>> 8964383b7b92608da874c137ffe483f99dfbda66
         obs = self._get_obs()
         
         self.action_space = spaces.Box(-1., 1., shape=(self.n_actions,), dtype='float32')
