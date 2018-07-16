@@ -4,7 +4,7 @@ from openai_gazebo import robot_gazebo_env
 from std_msgs.msg import Float64
 from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
-from tf.transformations import euler_from_quaternion
+from fetch_train.srv import EePose, EePoseRequest, EeRpy, EeRpyRequest, EeTraj, EeTrajRequest, JointTraj, JointTrajRequest
 
 
 class FetchEnv(robot_gazebo_env.RobotGazeboEnv):
@@ -12,6 +12,7 @@ class FetchEnv(robot_gazebo_env.RobotGazeboEnv):
     """
 
     def __init__(self):
+        print ("Entered Fetch Env")
         """Initializes a new Fetch environment.
 
         Args:
@@ -29,10 +30,11 @@ class FetchEnv(robot_gazebo_env.RobotGazeboEnv):
         """
 
         # We Start all the ROS related Subscribers and publishers
+        
         JOINT_STATES_SUBSCRIBER = '/joint_states'
         
-        self.joint_states_sub = rospy.Subscriber(JOINT_STATES_SUBSCRIBER, JointState, self.joint_states_callback)
-        self.joint_states_data = JointState()
+        self.joint_states_sub = rospy.Subscriber(JOINT_STATES_SUBSCRIBER, JointState, self.joints_callback)
+        self.joints = JointState()
         
         self.ee_traj_client = rospy.ServiceProxy('/ee_traj_srv', EeTraj)
         self.joint_traj_client = rospy.ServiceProxy('/joint_traj_srv', JointTraj)
@@ -69,7 +71,7 @@ class FetchEnv(robot_gazebo_env.RobotGazeboEnv):
 
     def _check_all_sensors_ready(self):
         self._check_joint_states_ready()
-        self._check_odom_ready()
+        #self._check_odom_ready()
         rospy.logdebug("ALL SENSORS READY")
 
     def _check_joint_states_ready(self):

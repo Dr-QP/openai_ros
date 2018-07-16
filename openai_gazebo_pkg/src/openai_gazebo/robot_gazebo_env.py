@@ -13,9 +13,11 @@ class RobotGazeboEnv(gym.GoalEnv):
     def __init__(self, robot_name_space, controllers_list, reset_controls):
 
         # To reset Simulations
+        print ("Entered Gazebo Env")
         self.gazebo = GazeboConnection()
         self.controllers_object = ControllersConnection(namespace=robot_name_space, controllers_list=controllers_list)
         self.reset_controls = reset_controls
+        print (self.reset_controls)
         self.seed()
 
         # Set up ROS related variables
@@ -40,10 +42,16 @@ class RobotGazeboEnv(gym.GoalEnv):
         Here we should convert the action num to movement action, execute the action in the
         simulation and get the observations result of performing that action.
         """
+        print ("Entered step")
+        print ("Unpause sim")
         self.gazebo.unpauseSim()
+        print ("Set action")
         self._set_action(action)
-        self.gazebo.pauseSim()
+        print ("Pause sim")
+        #self.gazebo.pauseSim()
+        print ("Get Obs")
         obs = self._get_obs()
+        print ("Is done")
         done = self._is_done(obs)
         info = {}
         reward = self._compute_reward(obs, done)
@@ -53,6 +61,7 @@ class RobotGazeboEnv(gym.GoalEnv):
 
     def reset(self):
         rospy.logdebug("Reseting RobotGazeboEnvironment")
+        print ("Entered reset")
         self._reset_sim()
         self._init_env_variables()
         self._update_episode()
@@ -94,6 +103,7 @@ class RobotGazeboEnv(gym.GoalEnv):
     def _reset_sim(self):
         """Resets a simulation
         """
+        print ("Entered reset")
         if self.reset_controls :
             self.gazebo.unpauseSim()
             self.controllers_object.reset_controllers()
@@ -116,7 +126,7 @@ class RobotGazeboEnv(gym.GoalEnv):
             self.gazebo.unpauseSim()
             
             self._check_all_systems_ready()
-            self.gazebo.pauseSim()
+            #self.gazebo.pauseSim()
         
 
         return True

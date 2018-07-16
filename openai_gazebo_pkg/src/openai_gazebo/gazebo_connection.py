@@ -22,9 +22,9 @@ class GazeboConnection():
         rospy.logdebug("Service Found " + str(service_name))
 
         self.set_physics = rospy.ServiceProxy(service_name, SetPhysicsProperties)
-        self.init_values()
+        #self.init_values()
         # We always pause the simulation, important for legged robots learning
-        self.pauseSim()
+        #self.pauseSim()
 
     def pauseSim(self):
         rospy.wait_for_service('/gazebo/pause_physics')
