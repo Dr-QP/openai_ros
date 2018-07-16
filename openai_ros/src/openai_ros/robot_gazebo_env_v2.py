@@ -14,7 +14,7 @@ class RobotGazeboEnv(gym.GoalEnv):
 
         # To reset Simulations
         print ("Entered Gazebo Env")
-        self.gazebo = GazeboConnection()
+        self.gazebo = GazeboConnection(start_init_physics_parameters=False)
         self.controllers_object = ControllersConnection(namespace=robot_name_space, controllers_list=controllers_list)
         self.reset_controls = reset_controls
         print (self.reset_controls)

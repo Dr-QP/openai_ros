@@ -2,17 +2,17 @@ from gym import utils
 
 import rospy
 from gym import spaces
-from openai_gazebo import fetch_env
+from openai_ros import fetch_env
 from gym.envs.registration import register
 import numpy as np
 from sensor_msgs.msg import JointState
 from fetch_train.srv import EePose, EePoseRequest, EeRpy, EeRpyRequest, EeTraj, EeTrajRequest, JointTraj, JointTrajRequest
-from openai_gazebo import rotations, fetch_utils
+from openai_ros import rotations, fetch_utils
 
 
 register(
         id='FetchReach-v0',
-        entry_point='openai_gazebo:FetchReachEnv',
+        entry_point='openai_ros:FetchReachEnv',
         timestep_limit=1000,
     )
 
