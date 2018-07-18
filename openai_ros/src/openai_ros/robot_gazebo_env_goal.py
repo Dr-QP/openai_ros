@@ -7,7 +7,7 @@ from .controllers_connection import ControllersConnection
 from theconstruct_msgs.msg import RLExperimentInfo
 
 # https://github.com/openai/gym/blob/master/gym/core.py
-#class RobotGazeboEnv(gym.Env):
+
 class RobotGazeboEnv(gym.GoalEnv):
 
     def __init__(self, robot_name_space, controllers_list, reset_controls):
@@ -46,6 +46,8 @@ class RobotGazeboEnv(gym.GoalEnv):
         print ("Unpause sim")
         self.gazebo.unpauseSim()
         print ("Set action")
+        print ("Action:")
+        print (action)
         self._set_action(action)
         print ("Pause sim")
         #self.gazebo.pauseSim()
@@ -103,8 +105,7 @@ class RobotGazeboEnv(gym.GoalEnv):
     def _reset_sim(self):
         """Resets a simulation
         """
-        print ("Entered reset")
-        if self.reset_controls :
+        if self.reset_controls:
             self.gazebo.unpauseSim()
             self.controllers_object.reset_controllers()
             self._check_all_systems_ready()
@@ -121,9 +122,9 @@ class RobotGazeboEnv(gym.GoalEnv):
             
             self._check_all_systems_ready()
             self._set_init_pose()
-            self.gazebo.pauseSim()
-            self.gazebo.resetSim()
-            self.gazebo.unpauseSim()
+            #self.gazebo.pauseSim()
+            self.gazebo.resetWorld()
+            #self.gazebo.unpauseSim()
             
             self._check_all_systems_ready()
             #self.gazebo.pauseSim()

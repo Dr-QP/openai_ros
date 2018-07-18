@@ -1,13 +1,13 @@
 import numpy
 import rospy
-from openai_ros import robot_gazebo_env_v2
+from openai_ros import robot_gazebo_env_goal
 from std_msgs.msg import Float64
 from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
 from fetch_train.srv import EePose, EePoseRequest, EeRpy, EeRpyRequest, EeTraj, EeTrajRequest, JointTraj, JointTrajRequest
 
 
-class FetchEnv(robot_gazebo_env_v2.RobotGazeboEnv):
+class FetchEnv(robot_gazebo_env_goal.RobotGazeboEnv):
     """Superclass for all Fetch environments.
     """
 
@@ -47,7 +47,7 @@ class FetchEnv(robot_gazebo_env_v2.RobotGazeboEnv):
 
         self.robot_name_space = ""
         
-        # We launch the init function of the Parent Class robot_gazebo_env_v2.RobotGazeboEnv
+        # We launch the init function of the Parent Class robot_gazebo_env_goal.RobotGazeboEnv
         super(FetchEnv, self).__init__(controllers_list=self.controllers_list,
                                                 robot_name_space=self.robot_name_space,
                                                 reset_controls=False)
@@ -71,18 +71,18 @@ class FetchEnv(robot_gazebo_env_v2.RobotGazeboEnv):
 
     def _check_all_sensors_ready(self):
         self._check_joint_states_ready()
-        #self._check_odom_ready()
+        
         rospy.logdebug("ALL SENSORS READY")
 
     def _check_joint_states_ready(self):
         self.joints = None
         while self.joints is None and not rospy.is_shutdown():
             try:
-                self.joints = rospy.wait_for_message("/moving_cube/joint_states", JointState, timeout=1.0)
-                rospy.logdebug("Current moving_cube/joint_states READY=>" + str(self.joints))
+                self.joints = rospy.wait_for_message("/joint_states", JointState, timeout=1.0)
+                rospy.logdebug("Current /joint_states READY=>" + str(self.joints))
 
             except:
-                rospy.logerr("Current moving_cube/joint_states not ready yet, retrying for getting joint_states")
+                rospy.logerr("Current /joint_states not ready yet, retrying for getting joint_states")
         return self.joints
 
     def _check_publishers_connection(self):
@@ -117,16 +117,6 @@ class FetchEnv(robot_gazebo_env_v2.RobotGazeboEnv):
         """
         # Set up a trajectory message to publish.
         
-        #print "Action at ee function"
-        #print action
-        """
-        self.pose_target = geometry_msgs.msg.Pose()
-        self.pose_target.orientation.w = 1.0
-        self.pose_target.position.x = action[0]
-        self.pose_target.position.y = action[1]
-        self.pose_target.position.z = action[2]
-        self.group.set_pose_target(self.pose_target)
-        """
         ee_target = EeTrajRequest()
         ee_target.pose.orientation.w = 1.0
         ee_target.pose.position.x = action[0]
@@ -134,7 +124,6 @@ class FetchEnv(robot_gazebo_env_v2.RobotGazeboEnv):
         ee_target.pose.position.z = action[2]
         result = self.ee_traj_client(ee_target)
         
-        #return action_msg
         return True
         
     def set_trajectory_joints(self, initial_qpos):
@@ -144,18 +133,7 @@ class FetchEnv(robot_gazebo_env_v2.RobotGazeboEnv):
         The velocities, accelerations, and effort do not control the arm motion
         """
         # Set up a trajectory message to publish.
-        """
-        self.group_variable_values = self.group.get_current_joint_values()
-
-        self.group_variable_values[0] = initial_qpos["joint0"]
-        self.group_variable_values[1] = initial_qpos["joint1"]
-        self.group_variable_values[2] = initial_qpos["joint2"]
-        self.group_variable_values[3] = initial_qpos["joint3"]
-        self.group_variable_values[4] = initial_qpos["joint4"]
-        self.group_variable_values[5] = initial_qpos["joint5"]
-        self.group_variable_values[6] = initial_qpos["joint6"]
-        self.group.set_joint_value_target(self.group_variable_values)
-        """
+        
         joint_point = JointTrajRequest()
         
         joint_point.point.positions = [None] * 7
@@ -166,9 +144,6 @@ class FetchEnv(robot_gazebo_env_v2.RobotGazeboEnv):
         joint_point.point.positions[4] = initial_qpos["joint4"]
         joint_point.point.positions[5] = initial_qpos["joint5"]
         joint_point.point.positions[6] = initial_qpos["joint6"]
-        
-        #print "Joint Point"
-        #print joint_point
         
         result = self.joint_traj_client(joint_point)
         
@@ -183,7 +158,6 @@ class FetchEnv(robot_gazebo_env_v2.RobotGazeboEnv):
         
     def get_ee_pose(self):
         
-        #gripper_pose = self.group.get_current_pose()
         gripper_pose_req = EePoseRequest()
         gripper_pose = self.ee_pose_client(gripper_pose_req)
         
@@ -191,7 +165,6 @@ class FetchEnv(robot_gazebo_env_v2.RobotGazeboEnv):
         
     def get_ee_rpy(self):
         
-        #gripper_rpy = self.group.get_current_rpy()
         gripper_rpy_req = EeRpyRequest()
         gripper_rpy = self.ee_rpy_client(gripper_rpy_req)
         

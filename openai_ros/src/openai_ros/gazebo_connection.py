@@ -13,7 +13,8 @@ class GazeboConnection():
         
         self.unpause = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
         self.pause = rospy.ServiceProxy('/gazebo/pause_physics', Empty)
-        self.reset_proxy = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
+        #self.reset_proxy = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
+        self.reset_proxy = rospy.ServiceProxy('/gazebo/reset_world', Empty)
 
         # Setup the Gravity Controle system
         service_name = '/gazebo/set_physics_properties'

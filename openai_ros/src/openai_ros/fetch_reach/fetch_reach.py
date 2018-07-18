@@ -30,7 +30,6 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
         print ("Call env setup")
         self._env_setup(initial_qpos=self.init_pos)
         
-        #self.goal = self._sample_goal()
         print ("Call get_obs")
         obs = self._get_obs()
         
