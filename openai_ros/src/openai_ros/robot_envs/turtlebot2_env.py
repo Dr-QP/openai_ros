@@ -269,7 +269,7 @@ class TurtleBot2Env(robot_gazebo_env.RobotGazeboEnv):
         :param update_rate: Rate at which we check the odometry.
         :return:
         """
-        rospy.logwarn("START wait_until_twist_achieved...")
+        rospy.logdebug("START wait_until_twist_achieved...")
         
         rate = rospy.Rate(update_rate)
         start_wait_time = rospy.get_rostime().to_sec()
@@ -299,15 +299,15 @@ class TurtleBot2Env(robot_gazebo_env.RobotGazeboEnv):
             angular_vel_are_close = (odom_angular_vel <= angular_speed_plus) and (odom_angular_vel > angular_speed_minus)
             
             if linear_vel_are_close and angular_vel_are_close:
-                rospy.logwarn("Reached Velocity!")
+                rospy.logdebug("Reached Velocity!")
                 end_wait_time = rospy.get_rostime().to_sec()
                 break
-            rospy.logwarn("Not there yet, keep waiting...")
+            rospy.logdebug("Not there yet, keep waiting...")
             rate.sleep()
         delta_time = end_wait_time- start_wait_time
         rospy.logdebug("[Wait Time=" + str(delta_time)+"]")
         
-        rospy.logwarn("END wait_until_twist_achieved...")
+        rospy.logdebug("END wait_until_twist_achieved...")
         
         return delta_time
         

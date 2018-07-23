@@ -126,7 +126,9 @@ class TurtleBot2MazeEnv(turtlebot2_env.TurtleBot2Env):
         # We tell TurtleBot2 the linear and angular speed to set to execute
         self.move_base(linear_speed, angular_speed, epsilon=0.05, update_rate=10)
         
+        rospy.logwarn("last_action ==>"+str(self.last_action))
         rospy.logdebug("END Set Action ==>"+str(action))
+        
 
     def _get_obs(self):
         """
@@ -153,7 +155,7 @@ class TurtleBot2MazeEnv(turtlebot2_env.TurtleBot2Env):
         if self._episode_done:
             rospy.logerr("TurtleBot2 is Too Close to wall==>")
         else:
-            rospy.logerr("TurtleBot2 is Ok ==>")
+            rospy.loginfo("TurtleBot2 is Ok ==>")
 
         return self._episode_done
 
@@ -190,8 +192,8 @@ class TurtleBot2MazeEnv(turtlebot2_env.TurtleBot2Env):
         mod = len(data.ranges)/new_ranges
         
         rospy.logdebug("data=" + str(data))
-        rospy.logwarn("new_ranges=" + str(new_ranges))
-        rospy.logwarn("mod=" + str(mod))
+        rospy.logdebug("new_ranges=" + str(new_ranges))
+        rospy.logdebug("mod=" + str(mod))
         
         for i, item in enumerate(data.ranges):
             if (i%mod==0):
@@ -206,7 +208,7 @@ class TurtleBot2MazeEnv(turtlebot2_env.TurtleBot2Env):
                     rospy.logerr("done Validation >>> item=" + str(item)+"< "+str(self.min_range))
                     self._episode_done = True
                 else:
-                    rospy.logwarn("NOT done Validation >>> item=" + str(item)+"< "+str(self.min_range))
+                    rospy.logdebug("NOT done Validation >>> item=" + str(item)+"< "+str(self.min_range))
                     
 
         return discretized_ranges
