@@ -7,7 +7,6 @@ from gym.envs.registration import register
 import numpy as np
 from sensor_msgs.msg import JointState
 from fetch_train.srv import EePose, EePoseRequest, EeRpy, EeRpyRequest, EeTraj, EeTrajRequest, JointTraj, JointTrajRequest
-from openai_ros import rotations, fetch_utils
 
 
 register(
@@ -106,7 +105,7 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
         grip_rpy = self.get_ee_rpy()
         #print grip_rpy
         grip_velp = np.array([grip_rpy.y, grip_rpy.y])
-        robot_qpos, robot_qvel = fetch_utils.robot_get_obs(self.joints)
+        robot_qpos, robot_qvel = self.robot_get_obs(self.joints)
         if self.has_object:
             object_pos = self.sim.data.get_site_xpos('object0')
             # rotations
@@ -230,4 +229,24 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
             
         self.goal = self._sample_goal()
         self._get_obs()
+        
+    def robot_get_obs(data):
+        
+        """
+        Returns all joint positions and velocities associated with a robot.
+        """
+    
+        if data.position is not None and data.name:
+            #names = [n for n in data.name if n.startswith('robot')]
+            names = [n for n in data.name]
+            i = 0
+            r = 0
+            for name in names:
+                r += 1
+                
+            return (
+                np.array([data.position[i] for i in range(r)]),
+                np.array([data.velocity[i] for i in range(r)]),
+            )
+        return np.zeros(0), np.zeros(0)
     
